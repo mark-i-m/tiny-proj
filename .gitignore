@@ -1,4 +1,5 @@
 *.swp
 *.swo
 
+mr_test/classes
 aws_common.pem
