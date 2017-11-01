@@ -1,0 +1,4 @@
+*.swp
+*.swo
+
+aws_common.pem
