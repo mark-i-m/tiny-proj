@@ -47,6 +47,8 @@ public class MRApplication {
         job.setMapperClass(TestMapper.class);
         job.setReducerClass(TestReducer.class);
 
+        job.setNumReduceTasks(Integer.parseInt(args[2]));
+
         job.setMapOutputKeyClass(IntWritable.class);
         job.setMapOutputValueClass(Text.class);
 
