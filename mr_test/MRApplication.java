@@ -11,9 +11,14 @@ import org.apache.hadoop.mapreduce.lib.output.*;
 import org.apache.hadoop.util.*;
 
 public class MRApplication {
+
+    // How much to amplify the input. For each value of input, there is this
+    // many values output by the mapper. So given a 1M line input, AMP = 2^10
+    // yields about a 8GB (2^10 * 1M * 8B) because a long is 8B.
+    private static final long AMP = 1 << 10;
     
     public static class TestMapper
-        extends Mapper<LongWritable, Text, IntWritable, Text>
+        extends Mapper<LongWritable, Text, LongWritable, LongWritable>
     {
         private Random rng = new Random();
         private static final int N = Integer.MAX_VALUE;
@@ -21,20 +26,21 @@ public class MRApplication {
         protected void map(LongWritable key, Text value, Context context)
             throws IOException, InterruptedException
         {
-            context.write(new IntWritable(rng.nextInt(N)), value);
+            for (long i = 0; i < AMP; i++) {
+                long val = (long)rng.nextInt(N);
+                context.write(new LongWritable(val), new LongWritable(val));
+            }
         }
     }
 
     public static class TestReducer
-        extends Reducer<IntWritable, Text, NullWritable, Text>
+        extends Reducer<LongWritable, Text, NullWritable, NullWritable>
     {
-        protected void reduce(IntWritable key, Iterable<Text> values, Context context)
+        protected void reduce(LongWritable key, Iterable<Text> values, Context context)
             throws IOException, InterruptedException
         { 
-            for (Text text : values) {
-                // only output the values
-                context.write(NullWritable.get(), text);
-            }
+            // only output the values
+            //context.write(NullWritable.get(), NullWritable.get());
         }
     }
 
@@ -49,11 +55,11 @@ public class MRApplication {
 
         job.setNumReduceTasks(Integer.parseInt(args[2]));
 
-        job.setMapOutputKeyClass(IntWritable.class);
-        job.setMapOutputValueClass(Text.class);
+        job.setMapOutputKeyClass(LongWritable.class);
+        job.setMapOutputValueClass(LongWritable.class);
 
         job.setOutputKeyClass(NullWritable.class);
-        job.setOutputValueClass(Text.class);
+        job.setOutputValueClass(NullWritable.class);
 
         job.setInputFormatClass(TextInputFormat.class);
         job.setOutputFormatClass(TextOutputFormat.class);
