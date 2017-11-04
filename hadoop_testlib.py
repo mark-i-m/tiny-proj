@@ -189,20 +189,20 @@ def create_hadoop_dirs(shell):
     shell.run("mkdir -p %s" % " ".join(dirs))
 
 def setup_instances_file(shell, slave_ip_addrs):
-    """Creates a file named `instances` containing all the slave IP addresses.
-    This `instances` file is used by our `run.sh` script to start Hadoop daemons
+    """Creates a file named `machines` containing all the slave IP addresses.
+    This `machines` file is used by our `run.sh` script to start Hadoop daemons
     on the slaves"""
     # XXX /etc/hosts may not be okay
 
     # Delete the previous instances file. Without doing this, we risk adding
     # duplicate entries to the file
-    shell.run("rm instances", allow_error=True)
-    shell.run("touch instances")
+    shell.run("rm machines", allow_error=True)
+    shell.run("touch machines")
 
     # Append all slave IP addrs to the file
     for slave_ip in slave_ip_addrs:
-        shell.run("echo %s >> instances" % slave_ip)
-    shell.run("cat instances")
+        shell.run("echo %s >> machines" % slave_ip)
+    shell.run("cat machines")
 
 def setup_intel_ISA_L(shell):
     try:
@@ -231,12 +231,15 @@ def setup_conf_tar(shell, master_ip):
             continue
         filepath = os.path.join("conf", filename)
         shell.run("sed -i -e 's/MASTER_IP/%s/g' %s" % (master_ip, filepath))
+        shell.run("sed -i -e 's/\/home\/ubuntu/\/users\/markm/g' %s" % filepath)
 
 def setup_run_sh(shell):
     """Copies over the run.sh script needed for running Hadoop daemons"""
     #copy_file(shell, "run.sh", "run.sh")
 
     shell.run("wget %s" % RUN_SH_PATH)
+
+    shell.run("sed -i -e 's/\/home\/ubuntu/\/users\/markm/g' run.sh")
 
 def copy_native_libraries(shell):
     cmd = "sudo cp software/hadoop-3.0.0-alpha1/lib/native/* /usr/lib/"
@@ -688,7 +691,7 @@ def check_datanode_health(shell, wait_time=None):
         time.sleep(wait_time)
 
     dn_topo_output = shell.run_hadoop_cmd("hadoop dfsadmin -printTopology").output
-    slave_ip_addrs = shell.run("cat instances").output.strip().split("\n")
+    slave_ip_addrs = shell.run("cat machines").output.strip().split("\n")
     for ip_addr in slave_ip_addrs:
         if not ip_addr:
             continue
