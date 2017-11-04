@@ -1,0 +1,82 @@
+2017-11-03 20:34:43,551 INFO  [main] fs.TrashPolicyDefault (TrashPolicyDefault.java:initialize(92)) - Namenode trash configuration: Deletion interval = 0 minutes, Emptier interval = 0 minutes.
+Deleted /output
+2017-11-03 20:34:45,870 INFO  [main] impl.TimelineClientImpl (TimelineClientImpl.java:serviceInit(285)) - Timeline service address: http://10.10.1.1:8188/ws/v1/timeline/
+2017-11-03 20:34:45,975 INFO  [main] client.RMProxy (RMProxy.java:createRMProxy(98)) - Connecting to ResourceManager at /10.10.1.1:8032
+2017-11-03 20:34:46,066 INFO  [main] client.AHSProxy (AHSProxy.java:createAHSProxy(42)) - Connecting to Application History server at /10.10.1.1:10200
+2017-11-03 20:34:46,243 WARN  [main] mapreduce.JobSubmitter (JobSubmitter.java:copyAndConfigureFiles(153)) - Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
+2017-11-03 20:34:46,481 INFO  [main] input.FileInputFormat (FileInputFormat.java:listStatus(281)) - Total input paths to process : 1
+2017-11-03 20:34:46,636 INFO  [main] mapreduce.JobSubmitter (JobSubmitter.java:submitJobInternal(494)) - number of splits:1
+2017-11-03 20:34:46,853 INFO  [main] mapreduce.JobSubmitter (JobSubmitter.java:printTokens(583)) - Submitting tokens for job: job_1509752981232_0024
+2017-11-03 20:34:47,050 INFO  [main] impl.YarnClientImpl (YarnClientImpl.java:submitApplication(251)) - Submitted application application_1509752981232_0024
+2017-11-03 20:34:47,087 INFO  [main] mapreduce.Job (Job.java:submit(1300)) - The url to track the job: http://vm0-lan:8088/proxy/application_1509752981232_0024/
+2017-11-03 20:34:47,088 INFO  [main] mapreduce.Job (Job.java:monitorAndPrintJob(1345)) - Running job: job_1509752981232_0024
+2017-11-03 20:34:52,187 INFO  [main] mapreduce.Job (Job.java:monitorAndPrintJob(1366)) - Job job_1509752981232_0024 running in uber mode : false
+2017-11-03 20:34:52,190 INFO  [main] mapreduce.Job (Job.java:monitorAndPrintJob(1373)) -  map 0% reduce 0%
+2017-11-03 20:35:02,316 INFO  [main] mapreduce.Job (Job.java:monitorAndPrintJob(1373)) -  map 38% reduce 0%
+2017-11-03 20:35:05,344 INFO  [main] mapreduce.Job (Job.java:monitorAndPrintJob(1373)) -  map 59% reduce 0%
+2017-11-03 20:35:08,376 INFO  [main] mapreduce.Job (Job.java:monitorAndPrintJob(1373)) -  map 67% reduce 0%
+2017-11-03 20:35:16,463 INFO  [main] mapreduce.Job (Job.java:monitorAndPrintJob(1373)) -  map 100% reduce 0%
+2017-11-03 20:35:23,542 INFO  [main] mapreduce.Job (Job.java:monitorAndPrintJob(1373)) -  map 100% reduce 10%
+2017-11-03 20:35:24,551 INFO  [main] mapreduce.Job (Job.java:monitorAndPrintJob(1373)) -  map 100% reduce 50%
+2017-11-03 20:35:25,562 INFO  [main] mapreduce.Job (Job.java:monitorAndPrintJob(1373)) -  map 100% reduce 100%
+2017-11-03 20:35:25,577 INFO  [main] mapreduce.Job (Job.java:monitorAndPrintJob(1384)) - Job job_1509752981232_0024 completed successfully
+2017-11-03 20:35:25,731 INFO  [main] mapreduce.Job (Job.java:monitorAndPrintJob(1391)) - Counters: 49
+        File System Counters
+                FILE: Number of bytes read=167772220
+                FILE: Number of bytes written=336724417
+                FILE: Number of read operations=0
+                FILE: Number of large read operations=0
+                FILE: Number of write operations=0
+                HDFS: Number of bytes read=33554524
+                HDFS: Number of bytes written=0
+                HDFS: Number of read operations=33
+                HDFS: Number of large read operations=0
+                HDFS: Number of write operations=20
+        Job Counters
+                Launched map tasks=1
+                Launched reduce tasks=10
+                Rack-local map tasks=1
+                Total time spent by all maps in occupied slots (ms)=110140
+                Total time spent by all reduces in occupied slots (ms)=270255
+                Total time spent by all map tasks (ms)=22028
+                Total time spent by all reduce tasks (ms)=54051
+                Total vcore-seconds taken by all map tasks=22028
+                Total vcore-seconds taken by all reduce tasks=54051
+                Total megabyte-seconds taken by all map tasks=105734400
+                Total megabyte-seconds taken by all reduce tasks=259444800
+        Map-Reduce Framework
+                Map input records=16777216
+                Map output records=16777216
+                Map output bytes=134217728
+                Map output materialized bytes=167772220
+                Input split bytes=92
+                Combine input records=0
+                Combine output records=0
+                Reduce input groups=10
+                Reduce shuffle bytes=167772220
+                Reduce input records=16777216
+                Reduce output records=16777216
+                Spilled Records=33554432
+                Shuffled Maps =10
+                Failed Shuffles=0
+                Merged Map outputs=10
+                GC time elapsed (ms)=506
+                CPU time spent (ms)=62260
+                Physical memory (bytes) snapshot=7936151552
+                Virtual memory (bytes) snapshot=62749265920
+                Total committed heap usage (bytes)=23839375360
+        Shuffle Errors
+                BAD_ID=0
+                CONNECTION=0
+                IO_ERROR=0
+                WRONG_LENGTH=0
+                WRONG_MAP=0
+                WRONG_REDUCE=0
+        File Input Format Counters
+                Bytes Read=33554432
+        File Output Format Counters
+                Bytes Written=0
+
+real    0m42.069s
+user    0m5.837s
+sys     0m0.308s
