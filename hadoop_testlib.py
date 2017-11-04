@@ -642,7 +642,7 @@ def setup_hadoop_testbase(master, slaves, large_disk):
         setup_disk_fs(shell, large_disk)
 
     # Setup passwordless access between the master and each of the slave nodes
-    setup_passwordless(nn_shell, slave_shells, allow_public_ip=False)
+    setup_passwordless(nn_shell, slave_shells + [nn_shell], allow_public_ip=False)
 
     # Setup instances file with slave IP addrs. This will be used by our scripts
     # for running daemons on slave nodes
