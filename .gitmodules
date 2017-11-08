@@ -1,3 +1,3 @@
 [submodule "hadoop"]
 	path = hadoop
-	url = git@github.com:apache/hadoop.git
+	url = git@github.com:mark-i-m/hadoop.git
