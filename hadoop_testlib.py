@@ -543,7 +543,7 @@ def run_TestDFSIO(shell, slave_shells, result_file="results.out",
         shell_usage_before = usage_before[ip_addr]
         shell_usage_after = usage_after[ip_addr]
         output += "USAGE %s RX: %d bytes\n" % (ip_addr,
-                                               shell_usage_after[0] - 
+                                               shell_usage_after[0] -
                                                shell_usage_before[0])
         output += "USAGE %s TX: %d bytes\n" % (ip_addr,
                                                shell_usage_after[1] -
@@ -606,6 +606,60 @@ def parse_host(host_str):
 
     return host, port
 
+def deploy_new_hadoop(master, slaves, tar, version):
+    """Creates and returns shells for the hadoop cluster.
+    Parameters:
+
+    @master: String of the form <hostname:port> containing NN info
+
+    @slaves: List of string of the form <hostname:port> containing slave info
+
+    @tar: The path to the hadoop tar to deploy
+
+    @version: The version number of the tar (e.g. "2.8.2")
+
+    Returns the master shell for running testcases"""
+
+    # Assume all entries are VMs and have ports embedded
+    # Create TestShell for the master
+    nn_hostname, nn_port = parse_host(master)
+    nn_shell = create_ssh_shell(nn_hostname, port=int(nn_port))
+    master_ip = nn_shell.get_private_ip_addr()
+
+    slave_ip_addrs = []
+    slave_shells = []
+
+    # Create TestShells for the slaves
+    assert isinstance(slaves, list)
+    for slave in slaves:
+        slave_hostname, slave_port = parse_host(slave)
+        slave_shell = create_ssh_shell(slave_hostname, port=int(slave_port))
+        slave_ip_addrs += \
+            [slave_shell.get_private_ip_addr(allow_public_ip=False)]
+        slave_shells += [slave_shell]
+
+    # stop all
+    stop_all(nn_shell, allow_error=True)
+
+    # copy the local tar to the master
+    hadoop_tar_name = os.path.basename(tar)
+    copy_file(nn_shell, tar, "/users/markm/" + hadoop_tar_name)
+
+    # copy tar from the master to everywhere else
+    for shell in slave_shells:
+        ip_addr = shell.get_private_ip_addr(allow_public_ip=False)
+        nn_shell.run("scp %s %s:~/" % (hadoop_tar_name, ip_addr))
+
+    for shell in slave_shells + [nn_shell]:
+        # remove the existing distribution on all nodes
+        shell.run("rm -rf software/hadoop-*")
+        # untar on all nodes
+        shell.run("tar xvzf %s -C software" % ("/users/markm/" + hadoop_tar_name))
+        # update run.sh on all nodes
+        shell.run("sed -i -e 's/VER=.*$/VER=%s/g' run.sh" % version)
+
+    return nn_shell, slave_shells
+
 def setup_hadoop_testbase(master, slaves, large_disk):
     """Sets up everything needed for Hadoop to run on the cluster.
     Parameters:
@@ -613,7 +667,7 @@ def setup_hadoop_testbase(master, slaves, large_disk):
     @master: String of the form <hostname:port> containing NN info
 
     @slaves: List of string of the form <hostname:port> containing slave info
- 
+
     @large_disk: The device of the disk we want to run everything on (e.g. /dev/sdb).
                  Note that this will be the same on _all_ machines, so check first...
 
