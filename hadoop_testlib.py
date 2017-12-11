@@ -20,6 +20,8 @@ USERNAME = "markm"
 HADOOP_TAR_PATH = "https://archive.apache.org/dist/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz"
 HADOOP_TAR_NAME = "hadoop-2.6.0.tar.gz"
 
+HADOOP_SHUFFLE_JAR_DEPLOY_PATH = "software/hadoop-2.8.2/share/hadoop/mapreduce/"
+
 CONF_TAR_PATH = "http://pages.cs.wisc.edu/~akella/CS744/F17/assignment1/conf.tar.gz"
 
 RUN_SH_PATH = "http://pages.cs.wisc.edu/~akella/CS744/F17/assignment1/run.sh"
@@ -607,7 +609,7 @@ def parse_host(host_str):
     return host, port
 
 def deploy_new_hadoop(master, slaves, tar, version):
-    """Creates and returns shells for the hadoop cluster.
+    """Deploy a new hadoop.tar.gz to the cluster and update run.sh
     Parameters:
 
     @master: String of the form <hostname:port> containing NN info
@@ -617,8 +619,7 @@ def deploy_new_hadoop(master, slaves, tar, version):
     @tar: The path to the hadoop tar to deploy
 
     @version: The version number of the tar (e.g. "2.8.2")
-
-    Returns the master shell for running testcases"""
+    """
 
     # Assume all entries are VMs and have ports embedded
     # Create TestShell for the master
@@ -657,6 +658,52 @@ def deploy_new_hadoop(master, slaves, tar, version):
         shell.run("tar xvzf %s -C software" % ("/users/markm/" + hadoop_tar_name))
         # update run.sh on all nodes
         shell.run("sed -i -e 's/VER=.*$/VER=%s/g' run.sh" % version)
+
+
+def deploy_new_shuffle(master, slaves, jar):
+    """Deploy a new shuffle.jar to the cluster
+    Parameters:
+
+    @master: String of the form <hostname:port> containing NN info
+
+    @slaves: List of string of the form <hostname:port> containing slave info
+
+    @jar: The path to the hadoop jar to deploy
+
+    @version: The version number of the tar (e.g. "2.8.2")
+
+    """
+
+    # Assume all entries are VMs and have ports embedded
+    # Create TestShell for the master
+    nn_hostname, nn_port = parse_host(master)
+    nn_shell = create_ssh_shell(nn_hostname, port=int(nn_port))
+    master_ip = nn_shell.get_private_ip_addr()
+
+    slave_ip_addrs = []
+    slave_shells = []
+
+    # Create TestShells for the slaves
+    assert isinstance(slaves, list)
+    for slave in slaves:
+        slave_hostname, slave_port = parse_host(slave)
+        slave_shell = create_ssh_shell(slave_hostname, port=int(slave_port))
+        slave_ip_addrs += \
+            [slave_shell.get_private_ip_addr(allow_public_ip=False)]
+        slave_shells += [slave_shell]
+
+    # stop all
+    stop_all(nn_shell, allow_error=True)
+
+    # copy the local tar to the master
+    hadoop_jar_name = os.path.basename(jar)
+    deploy_path = "/users/markm/" + HADOOP_SHUFFLE_JAR_DEPLOY_PATH + hadoop_jar_name
+    copy_file(nn_shell, jar, deploy_path)
+
+    # copy tar from the master to everywhere else
+    for shell in slave_shells:
+        ip_addr = shell.get_private_ip_addr(allow_public_ip=False)
+        nn_shell.run("scp %s %s:%s" % (deploy_path, ip_addr, deploy_path))
 
     return nn_shell, slave_shells
 
